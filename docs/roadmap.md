@@ -84,9 +84,9 @@ phrasing in YASAK KALIPLAR (the acceptance bar had frozen that section) and grow
 `SOHBET_TOHUM`/`KANAL_GECMIS` in line with line inflation (a fixed setting, needs live
 measurement).
 
-Remaining risk (to be seen live): emoji-reaction rate-limit behavior, the real pacing of
-line-bursting in an actual channel, the frequency of `-` silence (the prompt gets tuned if the
-model goes silent too much), `gonder_satirlar` delay constants (unmeasured).
+Confirmed live (2026-09-04, see docs/progress.md): line-bursting posts as separate messages in
+an actual channel, `-` silence occurs, emoji-reaction rate-limit behavior under real use, and
+`gonder_satirlar` delay constants. Still open: whether the `-` frequency needs prompt tuning.
 
 ## Mind panel image (2026-09-02) — ABANDONED, `zihin_gorsel.rs` deleted
 For a while `!zihin` posted a PNG panel instead of an embed (`src/zihin_gorsel.rs`,
@@ -111,8 +111,8 @@ slash commands" entry of `docs/progress.md`.
   were never touched — `include!` doesn't change visibility/`use super::*` at all.
 
 ## Pending / low priority (leftovers from the 5-agent report)
-- **No `reaction_add` event:** the bot reacts but doesn't see reactions landing on its own
-  messages (reaction to a reaction, "who laughed at what" info is lost).
+- ~~No `reaction_add` event~~ — DONE and confirmed live 2026-09-04: `Handler::reaction_add` +
+  `GUILD_MESSAGE_REACTIONS` now see reactions landing on the bot's own messages.
 - **Custom emoji reactions:** `extract_emoji` filters out the `:kekw:` form, only Unicode emoji
   get sent. `ReactionType::Custom` + validation against the server's emoji list is needed. The
   same work also brings in the emoji whitelist (ra-muhendislik §10 suggested it, deliberately
@@ -134,10 +134,10 @@ slash commands" entry of `docs/progress.md`.
   (accepted).
 - The wake-up agent may pick the wrong person → fallback: last message / tagged.
 - `.env`, `durum/`, `bot.log` are outside git (personal data). `photos/` has only `.gitkeep`.
-- **Reasoning:** live verification with glm-5.3-flash (`/zihin test:true`), whether effort=low
-  actually cuts down the thinking.
-- **Slash commands:** none of them (including the new 12) have ever been seen live on Discord;
-  option/choice appearance, the `defer`+`report_result` flow need to be verified.
+- **Reasoning:** confirmed live 2026-09-04 with glm-5.3-flash (budget×2, effort=low, JSON parsed
+  out of the thinking) — see docs/progress.md.
+- **Slash commands:** confirmed live 2026-09-04 (registration, defer+edit flow, embed output —
+  see docs/progress.md); every individual option/choice combination wasn't separately exercised.
 
 ## 2026-09-03 · Code translated to English — DONE
 `src/**/*.rs` + README.md were translated to English (identifiers, comments, file/directory

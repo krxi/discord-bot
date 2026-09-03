@@ -304,8 +304,13 @@ deliberately left as-is — see AGENTS.md item 8.
 ## Project status
 
 **v1.0.0 (2026).** The core (chat engine, memory, agents) is covered by 86 unit tests and
-passes `clippy` clean, but **live Discord behavior has not yet been verified** in this
-development environment (no bot token available here) — command registration, streaming
-cadence, reaction handling, and rate-limit behavior are all compiler- and test-verified only so
-far. See AGENTS.md's "Known gaps / unverified" section for the full, honestly-kept list before
-relying on this in production.
+passes `clippy` clean. As of 2026-09-04 the bot has also been run live on its real Discord
+server, across two rounds of testing, and the large majority of what used to be
+compiler-/test-only is now confirmed working in practice: basic messaging (line bursting, `-`
+silence, `tepki:` emoji reactions), the full slash command table, streaming + thinking, image
+commentary (gpt-4o-mini and Mistral), the reasoning-mandatory model's resilience path, debug
+mode, willingness/target/waking thresholds, channel/guild scope filters, reaction rate-limit
+behavior, `reaction_add`, CLI chat mode, end-to-end `BOT_LANG=en`, the `supports_cache`
+assumption, and the `durum.redb` migration against a real production tree. See AGENTS.md's
+"Known gaps / unverified" section for the short list of what's still open (mainly the
+CHANGE_NICKNAME-permission fallback path) before relying on this in production.

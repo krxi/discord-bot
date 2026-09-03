@@ -326,7 +326,13 @@ bırakılmıştır — bkz. AGENTS.md madde 8.
 ## Proje durumu
 
 **v1.0.0 (2026).** Çekirdek (sohbet motoru, hafıza, ajanlar) 86 birim testle kaplı ve
-`clippy`'den temiz geçiyor, ama **canlı Discord davranışı bu geliştirme ortamında henüz
-doğrulanmadı** (burada bot token'ı yok) — komut kaydı, akış temposu, tepki işleme ve hız sınırı
-davranışının hepsi yalnızca derleyici ve test seviyesinde doğrulandı. Üretimde kullanmadan önce
-AGENTS.md'nin "Known gaps / unverified" bölümündeki tam, dürüstçe tutulan listeye bakın.
+`clippy`'den temiz geçiyor. 2026-09-04 itibarıyla bot gerçek Discord sunucusunda iki ayrı turda
+canlı olarak da çalıştırıldı; daha önce yalnızca derleyici/test seviyesinde doğrulanmış olanların
+büyük çoğunluğu artık pratikte de çalıştığı görüldü: temel mesajlaşma (satır bazlı bölünme, `-`
+sessizliği, `tepki:` emoji reaksiyonları), slash komut tablosunun tamamı, akış + düşünme modu,
+görsel yorumlama (gpt-4o-mini ve Mistral), reasoning-zorunlu modelin direnç mekanizması, debug
+modu, isteklilik/hedef/uyanış eşik değerleri, kanal/sunucu kapsam filtreleri, reaksiyon
+hız-sınırı davranışı, `reaction_add`, CLI sohbet modu, uçtan uca `BOT_LANG=en`, `supports_cache`
+varsayımı ve `durum.redb` migrasyonunun gerçek bir prod ağacına karşı çalıştırılması. Hâlâ açık
+olan kısa listeyi (özellikle CHANGE_NICKNAME izni olmadığı durumdaki geri düşüş yolu) üretimde
+kullanmadan önce AGENTS.md'nin "Known gaps / unverified" bölümünden görebilirsiniz.

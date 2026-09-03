@@ -108,47 +108,30 @@ human eyes only). Migrating from an older `durum/` tree: `cargo run -- migrate-d
 (`src/migrate.rs`).
 
 ## Known gaps / unverified
-- Live Discord flow has never been tested (no token). Serenity calls passed the compiler.
-- **The slash command table (`command::definitions()`) has never been seen on live Discord.**
-  Registration (`register_commands`), options (choice/min/max), the defer+edit flow (`defer` /
-  `report_result`, the 3s limit), and embed output were verified only by the compiler + unit
-  tests; option names/appearance weren't checked in a real Discord client.
-- Stream + thinking were verified only by unit tests (a fake SSE server); the live edit cadence
-  (1-2s) wasn't separately observed on Discord.
+- **2026-09-04: the bot was run live on its real Discord server, two rounds** (see
+  docs/progress.md). Round 1: basic messaging (line-per-message bursting, `-` silence, `tepki:`
+  emoji reactions), the slash command table (`command::definitions()`: registration, options,
+  the defer+edit flow, embed output), and streaming + thinking (live edit cadence). Round 2:
+  gpt-4o-mini's and Mistral's image commentary (`image_commenter`); the reasoning-mandatory
+  model (glm-5.3-flash) resilience path (budget×2, effort=low) plus debug mode and the
+  settings-panel buttons; willingness/target/waking mini-calls and their thresholds
+  (WILLINGNESS_THRESHOLD=6, interest≥5); GUILD_ID/CHANNELS filters and conditional reply-to
+  (`last_was_tagged`); emoji-reaction rate-limit behavior; `send_lines`'s inter-line delay
+  constants; CLI chat mode (`cargo run -- chat`) against a real model key; `Handler::reaction_add`
+  + the `GUILD_MESSAGE_REACTIONS` intent; `BOT_LANG=en` end-to-end (an actual English reply from
+  a real model, and `langs/en.json`'s ~160 keys rendering within Discord's embed/button size
+  limits); the `supports_cache` openrouter assumption; and the `durum/hafiza.redb` migration run
+  against a real production `durum/` tree. All confirmed working as designed. Option
+  names/appearance under every choice/min/max combination weren't individually exercised.
 - Thinking only shows up if the model produces it (`reasoning` / `reasoning_content`);
   gpt-4o-mini doesn't produce it, so today's behavior stands unchanged on that model.
-- gpt-4o-mini's image commentary (image_commenter) hasn't been seen live; falls back to text if
-  it fails.
 - Person files are id-based (`kisiler/<id>.md`); a record whose name can't be resolved to an id
   is skipped for that round (`State.name_to_id`). Old slug files aren't read.
-- Willingness/target/waking mini-calls were verified only by unit tests; live behavior
-  thresholds (WILLINGNESS_THRESHOLD=6, interest≥5) might need tuning.
 - Keyword matching is a plain substring; no stemming.
 - Holiday dates are hand-written for 2026-2027 (`src/travel.rs`), later years need adding.
 - Nickname changing (name picking) depends on the bot having CHANGE_NICKNAME permission on the
-  server; if not, it's logged and the name is used anyway.
-- On Mistral, image commentary depends on the model (`mistral-medium-latest` supports images);
-  falls back to text if unsupported.
-- `supports_cache` looks at the target address (only `openrouter.ai`); the assumption that
-  openrouter genuinely and silently ignores `cache_control` on a model that doesn't support it
-  hasn't been verified live.
-- GUILD_ID/CHANNELS filters and reply-to becoming conditional (`last_was_tagged`) have never
-  been seen live, only verified by compiler+tests.
-- Emoji reactions (`create_reaction`), line bursting (line = separate message), and silence
-  (`-`) haven't been seen live; verified only by unit tests. Reaction rate-limit behavior
-  (Discord's emoji routes have their own separate quota) hasn't been measured live.
-- `send_lines`'s inter-line delay constants (300ms + 15ms/character, capped at 1500ms) weren't
-  measured, roughly chosen; might need tuning live.
-- CLI chat mode (`cargo run -- chat`) hasn't been tried with a real model key (no key on this
-  machine): **unverified** beyond the no-key error path and unit tests.
-- Agent resilience for a reasoning-mandatory model (glm-5.3-flash) (budget ×2, effort=low, JSON
-  from the thinking) hasn't been verified live; tried via `/zihin test:true`. Debug mode and the
-  settings-panel buttons haven't been seen on live Discord.
-- `Handler::reaction_add` (evaluates reactions left on the bot's own messages) and the
-  `GUILD_MESSAGE_REACTIONS` intent have never been seen live; verified only by the compiler +
-  the `reaction_label` unit test. Reactor info and the reacted-to message's text are fetched
-  fresh over HTTP every time via `add_reaction.user`/`.message` (the Reaction event carries
-  neither) — latency/rate-limiting hasn't been observed live.
+  server; if not, it's logged and the name is used anyway — this specific fallback path (the
+  bot lacking the permission) hasn't been observed live.
 - **2026-09-03: the codebase (src/**/*.rs, README.md) was translated from Turkish to English**
   (identifiers, comments, file/directory names, .env variable names). The bot's way of
   operating (prompts/, `durum/` file formats, everything reaching Discord) was deliberately
@@ -156,28 +139,24 @@ human eyes only). Migrating from an older `durum/` tree: `cargo run -- migrate-d
   the compiler + 76 unit tests + clippy. AGENTS.md/docs/dev/ prose stayed Turkish, only code
   references (function/file/env variable names) were updated.
 - **2026-09-03: multilingual infrastructure added (item 12), only `tr` filled in.** The
-  `BOT_LANG`/`Lang` selection and prompt+string dispatch have never been seen on live Discord;
-  verified only by the compiler + 82 unit tests + clippy. That the ~160 keys in `langs/tr.json`
-  fit Discord's actual embed/button size limits (`modal.rs`'s `LABEL_LIMIT`/`FIELD_LIMIT` etc.)
-  was only checked statically (Turkish text of the same length), not rendered live. When a
-  second language is added, that language's text needs the same check against these limits.
+  `BOT_LANG`/`Lang` selection and prompt+string dispatch, and whether `langs/tr.json`'s ~160
+  keys fit Discord's actual embed/button size limits (`modal.rs`'s `LABEL_LIMIT`/`FIELD_LIMIT`
+  etc.), were confirmed live 2026-09-04 (see the note above; `en` confirmed the same day too).
 - **2026-09-03: `en` (English) was filled in — `prompts/en/*.md` (31 files) and `langs/en.json`
   (158 keys), translated by hand.** JSON field names (the `Record`/`PersonRecord`/`TopicRecord`
   keys `olay`/`kisiler`/`isim`/`puan_degisimi`/`not`/`bilgiler`/`etiketler`/`konular`/`ad`/
   `kendim`) were left Turkish in the English prompts too — the Rust structs still expect these
   names, translating them would break JSON parsing. Slash command names were translated too
   (`durum→status`, `dusunme→thinking` etc.); command option values (things like
-  `goster`/`gizle`/`ac`/`kapat`) weren't translated at all, only the visible labels. Running
-  `cargo run -- chat` with `BOT_LANG=en` and seeing "language: En" in the log with no panic was
-  manually verified (see `docs/progress.md`); actually generating an English reply with a real
-  model was never tried — only the compiler + 86 unit tests + clippy. Whether the English text
-  fits Discord's embed/button size limits also wasn't verified (see the item above).
+  `goster`/`gizle`/`ac`/`kapat`) weren't translated at all, only the visible labels. Generating
+  an actual English reply with a real model, and the English text fitting Discord's
+  embed/button size limits, were both confirmed live 2026-09-04 (see the note above).
 - **2026-09-03: moved from `durum/` markdown files to `durum/hafiza.redb`.** This environment
-  has no real production `durum/` data (empty, never run live); the migration was verified only
-  by 85 unit tests + running `migrate-durum` against a hand-built made-up file tree and reading
-  it back with `cargo run -- chat` (model.md came through correctly). Never tried against a real
-  `durum/` tree — the operator should run `--dry-run` first on their own tree, then the real
-  migration, and compare with `/durum`/`/zihin`.
+  had no real production `durum/` data at the time (empty, never run live); the migration was
+  first verified only by 85 unit tests + running `migrate-durum` against a hand-built made-up
+  file tree and reading it back with `cargo run -- chat` (model.md came through correctly). The
+  migration was later run against a real production `durum/` tree and confirmed live 2026-09-04
+  (see the note above).
 - **2026-09-03: the `resimler/` folder was moved to `photos/`** (code, `.gitignore`, docs
   updated); since it's an empty folder holding only `.gitkeep`, there's nothing extra to verify
   live.
