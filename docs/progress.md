@@ -980,3 +980,5 @@ cargo fmt && cargo clippy --all-targets && cargo test && cargo build --release
 `AGENTS.md` rule: clippy 0 warnings expected. Identifiers are English and ASCII (`thought`,
 `trim`) — only the bot's Turkish way of operating (prompts/, durum/ file formats, everything that
 reaches Discord) is exempt, see AGENTS.md item 8.
+
+- 2026-09-06: graphify knowledge graph added (`graphify-out/`, 965 nodes / 1713 edges, 75 communities). Tracked: graph.json, GRAPH_REPORT.md, manifest.json; cache/html/cost ignored. Usage in AGENTS.md "Knowledge graph" and docs/development.md.

@@ -42,6 +42,7 @@ cargo run -- chat        # terminal chat bench without Discord (no token needed,
 | Adding a new agent/prompt/cycle/state file, pitfalls, checklist | docs/development.md |
 | Runtime vocabulary that stays Turkish (prompts, `durum/` fields, agent names) | docs/glossary.md |
 | Growth stages and name-picking | docs/modules.md (growth), docs/flows.md |
+| Code/doc knowledge graph: what connects to what, god nodes, cross-module bridges | graphify-out/graph.json (`/graphify query "..."`), graphify-out/GRAPH_REPORT.md |
 
 ## Invariant rules (also true in the code)
 1. **A lock is never held across an await.** `Bot::state()` returns a `std::sync::MutexGuard`;
@@ -98,6 +99,15 @@ cargo run -- chat        # terminal chat bench without Discord (no token needed,
     comes from `langs/<lang>.json` (`strings::t(key)`). `tr` and `en` are filled in; adding a
     new language means adding one file to each of these two directories plus one `match` arm
     each in `prompts.rs`/`strings.rs`.
+
+## Knowledge graph (graphify)
+`graphify-out/graph.json` is a persistent graph of the whole repo (Rust AST + docs + prompts),
+built with [graphify](https://github.com/Graphify-Labs/graphify). Before reading many files to
+answer a "what calls / what connects" question, query it: `/graphify query "<question>"`,
+`/graphify path "A" "B"`, `/graphify explain "State"`. After changing code or docs, refresh it
+with `/graphify . --update` (only changed files are re-read) and commit `graph.json` +
+`GRAPH_REPORT.md` together with the change. `cache/`, `graph.html`, `cost.json` are per-machine
+and ignored; rebuild the HTML with `graphify export html`.
 
 ## State folder (runtime, not tracked by git)
 `durum/hafiza.redb` (redb, a single file): `INDEX.md` pointer · `kisiler/` `konular/`

@@ -114,3 +114,18 @@ Top of `src/bot/types/types_settings.rs`; update `docs/constants.md`.
 - Simple stemming for keywords (Turkish suffixes).
 - `plans` and `posted_news` aren't written to disk; they reset on restart.
 - No voice channel events.
+
+## Knowledge graph (graphify)
+
+`graphify-out/graph.json` maps every Rust symbol, doc concept, and prompt role plus their
+edges (EXTRACTED / INFERRED / AMBIGUOUS). Use it instead of grepping across modules:
+
+```
+/graphify query "why does State bridge so many modules"
+/graphify path "parse_reply" "send_lines"
+/graphify explain "reply_budget! Macro"
+/graphify . --update      # after code/doc changes; only changed files are re-extracted
+graphify export html      # regenerate graph.html locally (ignored by git)
+```
+
+Commit `graph.json`, `GRAPH_REPORT.md`, `manifest.json` with the change that made them stale.
