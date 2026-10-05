@@ -25,7 +25,12 @@ impl Bot {
         let mut stream_error: Option<BotError> = None;
         // the mode stays fixed for the whole reply; if it changes mid-stream, that only
         // takes effect on the next reply
-        let mode = self.state().thinking_mode;
+        // stealth: a visible thought (spoiler, counter, button) is a bot tell, so show/hide
+        // fall back to silent — the model still reasons, nothing of it reaches the channel
+        let mode = match self.state().thinking_mode {
+            ThinkingMode::Show | ThinkingMode::Hide if self.stealth => ThinkingMode::Silent,
+            m => m,
+        };
         let start = Instant::now();
         let mut chunk_count: u32 = 0;
         let mut first_chunk_ms: Option<u128> = None;
@@ -41,7 +46,9 @@ impl Bot {
                     if matches!(mode, ThinkingMode::Show | ThinkingMode::Hide) {
                         thought.push_str(&p.thought);
                     }
-                    if first || last_write.elapsed() >= STREAM_EDIT_INTERVAL {
+                    // stealth: people don't type by live-editing a message, so nothing goes
+                    // out until the stream is done (the final layout below sends it whole)
+                    if !self.stealth && (first || last_write.elapsed() >= STREAM_EDIT_INTERVAL) {
                         // strip_name returns a slice: the whole text isn't cloned on every edit
                         let layout =
                             stream_view(mode, &thought, strip_name(&text, context.bot_name), false);

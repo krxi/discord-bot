@@ -4,6 +4,22 @@ Chronological. Newest at the top. Each line: date · commit (if any) · what+why
 
 ---
 
+## 2026-10-06 · serenity vendored
+serenity 0.12.5's crates.io source copied to `vendor/serenity/` and wired in via
+`[patch.crates-io]` in Cargo.toml, so it can be modified in-tree (user plans performance work).
+Unmodified so far. Since it's now a path dependency, cargo shows serenity's own 3 deprecation
+warnings on build (they were hidden as a registry dep); `cargo clippy` for this crate still 0.
+Verified: build + 86 tests.
+
+## 2026-10-06 · Stealth mode (`STEALTH` in .env)
+New startup-only flag `Bot.stealth` (`STEALTH=on/1/evet/açık`, default off) so the bot passes as
+a regular member. When on: `ready` makes no command API call at all (no registration, no
+clearing — commands left on Discord from an earlier run stay until removed by hand); `interaction_create` returns immediately; no embeds go out (version
+announcement in `guild_create`, `debug_note` — log only, `run_prank`'s "no images" notice);
+`send_stream` forces Show/Hide thinking to Silent (no spoiler/counter/button) and skips live
+edits, posting the final layout once the stream ends. Plain text, emoji reactions, images and
+the welcome ping are unchanged. Verified: build + 86 tests + clippy; not yet run live.
+
 ## 2026-09-04 · First live test on the bot's real Discord server
 User ran the bot against its actual Discord server (not a paste of logs — direct, hands-on
 testing) and confirmed three of the long-standing "unverified" items from AGENTS.md's "Known

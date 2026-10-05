@@ -757,7 +757,6 @@ pub async fn register_commands(http: &Http, guild: GuildId) -> Result<(), BotErr
     guild.set_commands(http, commands).await?;
     Ok(())
 }
-
 #[cfg(test)]
 mod test {
     use super::*;

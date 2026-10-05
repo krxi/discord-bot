@@ -15,6 +15,11 @@ base64 = "0.22"
 log = "0.4"
 redb = "4"
 
+# serenity is vendored (vendor/serenity, copied from crates.io 0.12.5) so it can be
+# modified in-tree; the version requirement above still has to match it
+[patch.crates-io]
+serenity = { path = "vendor/serenity" }
+
 [profile.release]
 strip = true
 lto = true

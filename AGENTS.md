@@ -23,7 +23,7 @@ cargo build            # build
 cargo test              # 86 unit tests (memory, agenda, travel, stream, willingness, target, cache, output protocol, chat_cli, command table, reply parsing, reaction label)
 cargo clippy             # 0 warnings expected
 cargo fmt                # before every commit
-cargo run --release      # .env: DISCORD_TOKEN + (OPENROUTER_KEY or MISTRAL_KEY); MODEL, PROVIDER, API_URL, FIRECRAWL_KEY, NEWS_CHANNEL, GUILD_ID, CHANNELS, DEBUG_CHANNEL, IMAGE_ANALYSIS optional
+cargo run --release      # .env: DISCORD_TOKEN + (OPENROUTER_KEY or MISTRAL_KEY); MODEL, PROVIDER, API_URL, FIRECRAWL_KEY, NEWS_CHANNEL, GUILD_ID, CHANNELS, DEBUG_CHANNEL, IMAGE_ANALYSIS, STEALTH optional
 cargo run -- chat        # terminal chat bench without Discord (no token needed, just a model key); for trying out the output protocol
 ```
 

@@ -26,10 +26,13 @@ impl EventHandler for Handler {
         }
         log::info!("logged in: {}", data.user.name);
 
-        // slash commands (/durum /yardim /zihin): registered per guild, idempotent
-        for guild in ctx.cache.guilds() {
-            if let Err(e) = modal::register_commands(&ctx.http, guild).await {
-                log::warn!("couldn't register slash commands [{guild}]: {e}");
+        // slash commands (/durum /yardim /zihin): registered per guild, idempotent. In
+        // stealth the command API isn't touched at all
+        if !self.bot.stealth {
+            for guild in ctx.cache.guilds() {
+                if let Err(e) = modal::register_commands(&ctx.http, guild).await {
+                    log::warn!("couldn't register slash commands [{guild}]: {e}");
+                }
             }
         }
 
@@ -74,7 +77,7 @@ impl EventHandler for Handler {
         // The guild cache isn't populated yet in `ready`, so the channel is found here
         // instead. Not written to memory: the bot shouldn't mistake this for its own
         // words and start making small talk about versions.
-        if !self.announced.swap(true, Ordering::SeqCst) {
+        if !self.bot.stealth && !self.announced.swap(true, Ordering::SeqCst) {
             if let Some(channel) = default_channel(&self.bot, &ctx) {
                 let (model, mode) = {
                     let state = self.bot.state();
@@ -486,6 +489,11 @@ impl EventHandler for Handler {
     /// `modal::topics_modal`/`events_modal`/`summary_modal`/`person_modal` (`Component`,
     /// zihin detail buttons/menu).
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
+        // stealth: no commands are registered and no buttons are sent, so anything arriving
+        // here is stale (an old button on an earlier message) — left unanswered
+        if self.bot.stealth {
+            return;
+        }
         match interaction {
             Interaction::Command(cmd) => {
                 match command::definitions().iter().find(|k| k.name == cmd.data.name) {

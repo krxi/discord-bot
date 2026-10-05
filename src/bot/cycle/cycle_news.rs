@@ -158,6 +158,10 @@ impl Bot {
     /// (`cycle_background.rs`), `Bot::cmd_prank`/`cmd_hack` (`command/actions.rs`).
     async fn run_prank(&self, ctx: &Context, channel: ChannelId, hack: bool) {
         let Some(image) = random_image() else {
+            if self.stealth {
+                log::warn!("prank: no images in photos/, skipped");
+                return;
+            }
             let msg = CreateMessage::new()
                 .embed(modal::info_embed(strings::t("prank.title"), strings::t("prank.no_images")));
             let _ = channel.send_message(&ctx.http, msg).await;

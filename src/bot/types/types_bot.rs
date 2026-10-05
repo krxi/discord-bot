@@ -50,6 +50,11 @@ struct Bot {
     // (deliberate: an operator who turns it off shouldn't be able to turn it back on
     // without restarting the process)
     image_analysis: bool,
+    // .env STEALTH; startup-only like image_analysis. When on, nothing bot-shaped reaches
+    // Discord: slash commands aren't registered (or touched at all), interactions are ignored,
+    // no embeds (announcement, debug trace, prank notice), no thought display/button, and
+    // a streamed reply is posted once finished instead of being live-edited in
+    stealth: bool,
     // models learned to refuse turning reasoning off (see reasoning_mandatory_error): once
     // a model is known, the "turn it off" attempt is skipped entirely and the call goes
     // out with low-effort reasoning from the start — otherwise every call would eat the

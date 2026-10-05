@@ -49,6 +49,12 @@ impl Bot {
             "image analysis: {}",
             if image_analysis { "on" } else { "off" }
         );
+        // defaults to off, the opposite of IMAGE_ANALYSIS: only an explicit "on" enables it
+        let stealth = matches!(
+            std::env::var("STEALTH").unwrap_or_default().trim(),
+            "acik" | "açık" | "on" | "evet" | "1"
+        );
+        log::info!("stealth: {}", if stealth { "on" } else { "off" });
         let news_channel = match std::env::var("NEWS_CHANNEL") {
             Ok(v) if !v.trim().is_empty() => Some(ChannelId::new(v.trim().parse()?)),
             _ => None,
@@ -110,6 +116,7 @@ impl Bot {
                 .and_then(|v| v.trim().parse::<u64>().ok())
                 .map(ChannelId::new),
             image_analysis,
+            stealth,
             reasoning_mandatory_models: Mutex::new(HashSet::new()),
         }))
     }
@@ -126,6 +133,10 @@ impl Bot {
             return;
         }
         log::info!("debug [{channel}]: {text}");
+        // stealth: the trace stays in the log, never posted as an embed
+        if self.stealth {
+            return;
+        }
         let target = self.debug_channel.unwrap_or(channel);
         let body: String = text.chars().take(300).collect();
         let msg =
